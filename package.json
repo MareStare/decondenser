@@ -6,7 +6,7 @@
     "description": "Format your condensed code based on bracket placement.",
     "repository": {
         "type": "git",
-        "url": "https://github.com/nitkach/decondenser.git"
+        "url": "https://github.com/amredev/decondenser"
     },
     "version": "0.0.3",
     "engines": {
