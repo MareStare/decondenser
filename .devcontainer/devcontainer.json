@@ -1,0 +1,111 @@
+{
+  // See the docs at https://containers.dev/implementors/json_reference/
+  "image": "ghcr.io/amredev/devcontainer-decondenser:latest",
+
+  "workspaceMount": "source=${localWorkspaceFolder},target=/home/amredev/workspace,type=bind,consistency=cached",
+  "workspaceFolder": "/home/amredev/workspace",
+  "overrideCommand": false,
+
+  "containerEnv": {
+    "HOST_WORKSPACE": "${localWorkspaceFolder}"
+  },
+
+  "mounts": [
+    // A directory that is meant to be persisted across container rebuilds.
+    // It contains shell history and can be used to store some caches.
+    {
+      "source": "devcontainer-persisted",
+      "target": "/home/amredev/persisted",
+      "type": "volume"
+    }
+  ],
+
+  "customizations": {
+    "vscode": {
+      "settings": {
+        // Use the workspace's version of TS, not the one that comes
+        // preinstalled with VSCode
+        "typescript.tsdk": "node_modules/typescript/lib",
+
+        "rust-analyzer.server.extraEnv": {
+          // Use a system-wide target directory dedicated for rust-analyzer.
+          // This way RA never blocks builds by locking the local target directory.
+          "CARGO_TARGET_DIR": "/home/amredev/persisted/rust-analyzer-target"
+        },
+
+        "[toml]": {
+          "editor.defaultFormatter": "tamasfe.even-better-toml"
+        },
+
+        "evenBetterToml.taplo.configFile.enabled": true,
+        "evenBetterToml.taplo.configFile.path": "./taplo.toml",
+
+        // evenBetterToml defines some custom text mate scopes that aren't known
+        // to your color theme, so we just define colors for them manually
+        "editor.tokenColorCustomizations": {
+          "[*Dark*]": {
+            "textMateRules": [
+              {
+                "scope": "support.type.property-name.table.toml",
+                "settings": {
+                  "foreground": "#4EC9B0"
+                }
+              }
+            ]
+          }
+        },
+
+        "files.exclude": {
+          "out": false, // set this to true to hide the "out" folder with the compiled JS files
+          "dist": false // set this to true to hide the "dist" folder with the compiled JS files
+        },
+
+        "search.exclude": {
+          "out": true, // set this to false to include "out" folder in search results
+          "dist": true // set this to false to include "dist" folder in search results
+        },
+
+        // Turn off tsc task auto detection since we have the necessary tasks as npm scripts
+        "typescript.tsc.autoDetect": "off"
+      },
+      "extensions": [
+        // Rust LSP
+        "rust-lang.rust-analyzer",
+
+        // TOML LSP
+        "tamasfe.even-better-toml",
+
+        // Better TS diagnostics in IDE. It's recommended to go through these
+        // instructions here to make the errors less noisy and more convenient,
+        // unfortunately, this can't be configured at this level, because CSS
+        // extension always run on the host machine:
+        // https://github.com/yoavbls/pretty-ts-errors/blob/main/docs/hide-original-errors.md
+        "yoavbls.pretty-ts-errors",
+
+        // Dockerfile LSP by Docker Inc.
+        "docker.docker",
+
+        // Github Actions LSP
+        "github.vscode-github-actions",
+
+        // Bash LSP
+        "mads-hartmann.bash-ide-vscode",
+
+        // `.js`, `.ts` linter
+        "dbaeumer.vscode-eslint",
+
+        // `.js`, `.ts`. `.css`, `.json`, `.yaml`, `.md` formatter
+        "esbenp.prettier-vscode",
+
+        // Spell checker enforced on CI
+        "tekumara.typos-vscode",
+
+        // Inline git blame annotations
+        "eamodio.gitlens",
+
+        // Runner for VSCode extension tests
+        "ms-vscode.extension-test-runner"
+      ]
+    }
+  }
+}
