@@ -5,8 +5,8 @@
     "context": ".."
   },
 
-  "workspaceMount": "source=${localWorkspaceFolder},target=/home/amredev/workspace,type=bind,consistency=cached",
-  "workspaceFolder": "/home/amredev/workspace",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/home/amredev/decondenser,type=bind,consistency=cached",
+  "workspaceFolder": "/home/amredev/decondenser",
   "overrideCommand": false,
 
   "containerEnv": {
