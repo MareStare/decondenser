@@ -14,8 +14,6 @@
   },
 
   "mounts": [
-    // A directory that is meant to be persisted across container rebuilds.
-    // It contains shell history and can be used to store some caches.
     {
       "source": "shell-history",
       "target": "/home/amredev/shell-history",
