@@ -2,6 +2,6 @@
 
 set -euo pipefail
 
-. "$HOME/amrebash/lib.sh"
+. "$HOME/amrebash/utils/lib.sh"
 
 step npm install || true
