@@ -45,7 +45,6 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
-    "package": "npm run build ",
     "build": "../decondenser-ts/build.sh && ./esbuild.mjs",
     "lint": "tsc --noEmit && eslint src",
     "fmt": "prettier --write .",
