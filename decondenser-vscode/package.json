@@ -1,0 +1,67 @@
+{
+  "name": "decondenser-vscode",
+  "displayName": "Decondenser",
+  "publisher": "amredev",
+  "icon": "assets/marketplace-icon.png",
+  "description": "Format your code based on bracket placement",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/amredev/decondenser"
+  },
+  "version": "0.0.3",
+  "engines": {
+    "vscode": "^1.97.0"
+  },
+  "categories": [
+    "Formatters"
+  ],
+  "activationEvents": [],
+  "main": "./dist/extension.js",
+  "extensionKind": [
+    "ui",
+    "workspace"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "decondenser.decondense",
+        "title": "Decondenser: Decondense"
+      },
+      {
+        "command": "decondenser.unescape.decondense",
+        "title": "Decondenser: Unescape + decondense"
+      }
+    ],
+    "configuration": {
+      "title": "Decondenser",
+      "properties": {
+        "decondenser.indentationSize": {
+          "type": "integer",
+          "default": 4,
+          "description": "Number of spaces used for indentation"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "package": "npm run build ",
+    "build": "../decondenser-ts/build.sh && ./esbuild.mjs",
+    "lint": "tsc --noEmit && eslint src",
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  },
+  "dependencies": {
+    "decondenser": "0.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "20.x",
+    "@types/vscode": "^1.100.0",
+    "@typescript-eslint/eslint-plugin": "^8.31.1",
+    "@typescript-eslint/parser": "^8.31.1",
+    "esbuild": "^0.25.5",
+    "eslint": "^9.25.1",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.3"
+  }
+}

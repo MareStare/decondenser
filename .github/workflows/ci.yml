@@ -7,7 +7,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/amredev/devcontainer-decondenser:latest
+      image: ghcr.io/amredev/devcontainer-decondenser:1.14.0
       options: --user 0
 
     steps:

@@ -1,0 +1,6 @@
+package amredev:decondenser;
+
+world decondenser {
+    export unescape: func(input: string) -> string;
+    export decondense: func(input: string, indent: string) -> string;
+}

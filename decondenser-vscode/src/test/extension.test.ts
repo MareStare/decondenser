@@ -8,9 +8,9 @@ import * as vscode from "vscode";
 import * as decondenser from "../extension";
 
 function formatUnescapedText(text: string): string {
-    const uglyText = decondenser.unescapeText(text);
+    const uglyText = decondenser.unescape(text);
 
-    const prettyText = decondenser.formatUglyText(uglyText, "    ");
+    const prettyText = decondenser.decondense(uglyText, "    ");
 
     return prettyText;
 }
@@ -40,13 +40,13 @@ Test {
         123
     ]
 }`;
-        const output = decondenser.formatUglyText(text, "    ");
+        const output = decondenser.decondense(text, "    ");
         assert.strictEqual(expected, output);
     });
 
     test("Escape test", () => {
         const text = `{"key": "\\n\\r\\t"}`;
-        const output = decondenser.formatUglyText(text, "    ");
+        const output = decondenser.decondense(text, "    ");
         assert.strictEqual(`{\n    "key": "\\n\\r\\t"\n}`, output);
     });
 
