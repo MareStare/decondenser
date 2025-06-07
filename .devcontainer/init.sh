@@ -2,6 +2,7 @@
 
 set -euo pipefail
 
-. "$HOME/amrebash/utils/lib.sh"
+. "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/../scripts/utils/lib.sh"
 
+# Start the container even if installation fails
 step npm install || true

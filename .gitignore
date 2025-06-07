@@ -3,3 +3,7 @@ dist
 node_modules
 .vscode-test/
 *.vsix
+target/
+
+# This file is code-generated via `cargo component` during the build
+decondenser-wasm/src/bindings.rs

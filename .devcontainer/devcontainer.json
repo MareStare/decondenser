@@ -5,8 +5,11 @@
     "context": ".."
   },
 
-  "workspaceMount": "source=${localWorkspaceFolder},target=/home/amredev/decondenser,type=bind,consistency=cached",
-  "workspaceFolder": "/home/amredev/decondenser",
+  // Mounting the parent folder of the repository to be able to add path
+  // dependencies to other repositories or switch to other repos easily.
+  // We assume this repo lives in a folder called `decondenser` on host.
+  "workspaceMount": "source=${localWorkspaceFolder}/..,target=/home/amredev/dev,type=bind,consistency=cached",
+  "workspaceFolder": "/home/amredev/dev/decondenser",
   "overrideCommand": false,
 
   "containerEnv": {
@@ -42,6 +45,10 @@
           // Use a system-wide target directory dedicated for rust-analyzer.
           // This way RA never blocks builds by locking the local target directory.
           "CARGO_TARGET_DIR": "/home/amredev/rust-analyzer-target"
+        },
+
+        "[javascript][typescript]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
         },
 
         "[toml]": {
@@ -86,6 +93,9 @@
         // TOML LSP
         "tamasfe.even-better-toml",
 
+        // WIT basic support
+        "bytecodealliance.wit-idl",
+
         // Better TS diagnostics in IDE. It's recommended to go through these
         // instructions here to make the errors less noisy and more convenient,
         // unfortunately, this can't be configured at this level, because CSS
@@ -104,6 +114,12 @@
 
         // Bash LSP
         "mads-hartmann.bash-ide-vscode",
+
+        // Shell scripts linter
+        "timonwong.shellcheck",
+
+        // Shell scripts formatter
+        "foxundermoon.shell-format",
 
         // `.js`, `.ts` linter
         "dbaeumer.vscode-eslint",
