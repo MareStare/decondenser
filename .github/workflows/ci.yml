@@ -85,6 +85,7 @@ jobs:
           tool: cargo-component
           version: dev
 
+      - run: cargo-component bindings
       - run: cargo doc --no-deps
 
   # Check for typos in the repository based on a static dictionary
