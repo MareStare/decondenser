@@ -121,3 +121,15 @@ jobs:
       - run: cargo clippy ${{ matrix.locked }} --all-features --all-targets
       - run: cargo test ${{ matrix.locked }} --all-features --all-targets
       - run: cargo test ${{ matrix.locked }} --all-features --doc
+
+  # Check the formatting of TOML files in the repository
+  taplo-fmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: amredev/imaginarium/install@main
+        with:
+          tool: taplo
+          version: 0.10.0
+
+      - run: taplo fmt --check
