@@ -12,6 +12,10 @@ env:
   # This disables incremental compilation for workspace packages and path deps.
   CARGO_INCREMENTAL: 0
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   build:
     runs-on: ubuntu-latest
