@@ -134,7 +134,10 @@
         "eamodio.gitlens",
 
         // Runner for VSCode extension tests
-        "ms-vscode.extension-test-runner"
+        "ms-vscode.extension-test-runner",
+
+        // TOML LSP
+        "tamasfe.even-better-toml"
       ]
     }
   }
