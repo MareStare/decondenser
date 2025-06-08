@@ -80,6 +80,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions-rust-lang/setup-rust-toolchain@v1
+      - uses: amredev/imaginarium/install@main
+        with:
+          tool: cargo-component
+          version: dev
+
       - run: cargo doc --no-deps
 
   # Check for typos in the repository based on a static dictionary
