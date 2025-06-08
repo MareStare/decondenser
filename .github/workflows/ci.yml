@@ -15,12 +15,18 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/amredev/devcontainer-decondenser:1.15.0
-      options: --user 0
+
+    strategy:
+      matrix:
+        os: [ubuntu, macos, windows]
 
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: package.json
+          cache: npm
+
       - run: npm ci --workspaces
       - run: npm run --workspace decondenser-vscode lint
       - run: npm run --workspace decondenser-vscode build
@@ -48,39 +54,51 @@ jobs:
 
   cargo-fmt:
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/amredev/devcontainer-decondenser:1.15.0
-      options: --user 0
 
     steps:
       - uses: actions/checkout@v4
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          components: rustfmt
+
       - run: cargo fmt --all -- --check
 
   cargo-doc:
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/amredev/devcontainer-decondenser:1.15.0
-      options: --user 0
 
     steps:
       - uses: actions/checkout@v4
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
       - run: cargo doc --no-deps
 
-  test-stable:
+  # Check for typos in the repository based on a static dictionary
+  typos:
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/amredev/devcontainer-decondenser:1.15.0
-      options: --user 0
+    steps:
+      - uses: actions/checkout@v4
+      - uses: crate-ci/typos@v1.33.1
+
+  test-stable:
+    runs-on: ${{ matrix.os }}-latest
 
     continue-on-error: ${{ matrix.locked == '' }}
 
     strategy:
       fail-fast: false
       matrix:
+        os: [ubuntu, macos, windows]
         locked: [--locked, ""]
 
     steps:
       - uses: actions/checkout@v4
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          components: clippy
+      - uses: amredev/imaginarium/install@main
+        with:
+          tool: cargo-component
+          version: dev
+
       - run: cargo clippy ${{ matrix.locked }} --all-features --all-targets
       - run: cargo test ${{ matrix.locked }} --all-features --all-targets
       - run: cargo test ${{ matrix.locked }} --all-features --doc
