@@ -206,7 +206,6 @@ pub fn decondense(input: &str, indent: &str) -> String {
     output.join("")
 }
 
-
 // TODO: add tests
 // suite("Extension Test Suite", () => {
 //     vscode.window.showInformationMessage("Start all tests.");

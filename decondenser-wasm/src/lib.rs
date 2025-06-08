@@ -2,6 +2,7 @@
 /// <https://github.com/bytecodealliance/cargo-component>
 #[allow(warnings)]
 #[rustfmt::skip]
+#[doc(hidden)]
 mod bindings;
 
 struct Component;
