@@ -22,11 +22,17 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
       - uses: actions/setup-node@v4
         with:
           node-version-file: package.json
           cache: npm
+      - uses: amredev/imaginarium/install@main
+        with:
+          tool: cargo-component
+          version: dev
 
+      - run: ./decondenser-ts/build.sh
       - run: npm ci --workspaces
       - run: npm run --workspace decondenser-vscode lint
       - run: npm run --workspace decondenser-vscode build
@@ -98,6 +104,8 @@ jobs:
         with:
           tool: cargo-component
           version: dev
+
+      - run: cargo-component bindings
 
       - run: cargo clippy ${{ matrix.locked }} --all-features --all-targets
       - run: cargo test ${{ matrix.locked }} --all-features --all-targets
