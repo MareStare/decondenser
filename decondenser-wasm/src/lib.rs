@@ -1,6 +1,7 @@
 /// The bindings are generated via `cargo component`:
 /// <https://github.com/bytecodealliance/cargo-component>
 #[allow(warnings)]
+#[rustfmt::skip]
 mod bindings;
 
 struct Component;
