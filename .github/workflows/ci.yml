@@ -33,8 +33,8 @@ jobs:
           tool: cargo-component
           version: dev
 
-      - run: ./decondenser-ts/build.sh
       - run: npm ci --workspaces
+      - run: ./decondenser-ts/build.sh
       - run: npm run --workspace decondenser-vscode lint
       - run: npm run --workspace decondenser-vscode build
 
