@@ -3,14 +3,18 @@
 version = 4
 
 [[package]]
-name = "decondenser-core"
+name = "decondenser"
+version = "0.1.0"
+
+[[package]]
+name = "decondenser-cli"
 version = "0.1.0"
 
 [[package]]
 name = "decondenser-wasm"
 version = "0.1.0"
 dependencies = [
- "decondenser-core",
+ "decondenser",
  "wit-bindgen-rt",
 ]
 
