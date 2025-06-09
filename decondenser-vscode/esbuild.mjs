@@ -4,10 +4,9 @@
 import * as esbuild from "esbuild";
 
 const prod = process.env.MODE === "prod";
-const platform = process.argv.includes("--browser") ? "browser" : "node";
 
 await esbuild.build({
-    target: 'es2020',
+    target: "es2023",
     format: "cjs",
     outfile: `dist/extension.js`,
     entryPoints: ["src/extension.ts"],
@@ -16,5 +15,6 @@ await esbuild.build({
     sourcesContent: false,
     minify: prod,
     sourcemap: !prod,
-    platform,
+    platform: "neutral",
+    mainFields: ["module", "main"],
 });

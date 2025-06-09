@@ -5,5 +5,16 @@
   "workspaces": [
     "./decondenser-vscode",
     "./decondenser-ts"
-  ]
+  ],
+  "scripts": {
+    "lint": "eslint",
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "@eslint/compat": "^1.2.8",
+    "eslint": "^9.25.1",
+    "prettier": "3.5.3",
+    "typescript-eslint": "^8.24.1"
+  }
 }
