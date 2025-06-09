@@ -6,3 +6,6 @@ set -euo pipefail
 
 # Start the container even if installation fails
 step npm install --workspaces --include-workspace-root || true
+
+# Install the pre-commit hook. It's a symlink, to make sure it stays always up-to-date.
+step ln -sf ../../.githooks/pre-commit .git/hooks/pre-commit
