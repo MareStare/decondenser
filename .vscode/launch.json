@@ -5,7 +5,9 @@
       "name": "Run Extension",
       "type": "extensionHost",
       "request": "launch",
-      "args": ["--extensionDevelopmentPath=${workspaceFolder}/decondenser-vscode"],
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}/decondenser-vscode"
+      ],
       "outFiles": ["${workspaceFolder}/decondenser-vscode/dist/**/*.js"],
       "preLaunchTask": "${defaultBuildTask}"
     }

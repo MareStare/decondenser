@@ -45,10 +45,7 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
-    "build": "../decondenser-ts/build.sh && ./esbuild.mjs",
-    "lint": "tsc --noEmit && eslint src",
-    "fmt": "prettier --write .",
-    "fmt:check": "prettier --check ."
+    "build": "tsc --noEmit && ../decondenser-ts/build.sh && ./esbuild.mjs"
   },
   "dependencies": {
     "decondenser": "0.1.0"
@@ -56,11 +53,7 @@
   "devDependencies": {
     "@types/node": "20.x",
     "@types/vscode": "^1.100.0",
-    "@typescript-eslint/eslint-plugin": "^8.31.1",
-    "@typescript-eslint/parser": "^8.31.1",
     "esbuild": "^0.25.5",
-    "eslint": "^9.25.1",
-    "prettier": "^3.5.3",
     "typescript": "^5.8.3"
   }
 }

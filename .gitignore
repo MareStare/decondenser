@@ -1,4 +1,3 @@
-out
 dist
 node_modules
 .vscode-test/
@@ -7,3 +6,9 @@ target/
 
 # This file is code-generated via `cargo component` during the build
 decondenser-wasm/src/bindings.rs
+
+# Files where logs can be stored and not committed
+*.log
+
+# Special name pattern for dirty experimentation that should not be committed
+*dbg*
