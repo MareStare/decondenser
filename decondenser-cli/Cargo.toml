@@ -2,6 +2,13 @@
 name    = "decondenser-cli"
 version = "0.1.0"
 
+# At the time of this writing only pre-compiled binaries are distributed.
+# It's still possible to compile this crate from source with
+# ```
+# cargo install --git https://github.com/amredev/decondenser decondenser-cli
+# ```
+publish = false
+
 edition    = { workspace = true }
 license    = { workspace = true }
 repository = { workspace = true }
@@ -9,5 +16,11 @@ repository = { workspace = true }
 [lints]
 workspace = true
 
+[[bin]]
+name = "decondenser"
+path = "src/main.rs"
+
 [dependencies]
-# This kid is independent 😎
+anyhow      = "1.0"
+clap        = { version = "4.5", features = ["derive"] }
+decondenser = { path = "../decondenser" }
