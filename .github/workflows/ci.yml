@@ -37,7 +37,7 @@ jobs:
           tool: cargo-component
           version: dev
 
-      - run: npm ci --workspaces
+      - run: npm ci --workspaces --include-workspace-root
       - run: ./decondenser-ts/build.sh
       - run: npm run fmt:check
       - run: npm run lint
