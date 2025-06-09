@@ -20,6 +20,10 @@ workspace = true
 name = "decondenser"
 path = "src/main.rs"
 
+# If docs are enabled, they collide with the docs for the `decondenser` library
+# crate. Details: https://github.com/rust-lang/cargo/issues/6313
+doc = false
+
 [dependencies]
 anyhow      = "1.0"
 clap        = { version = "4.5", features = ["derive"] }
