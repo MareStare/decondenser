@@ -1,6 +1,7 @@
 [package]
 name    = "decondenser-cli"
 version = "0.1.0"
+description = "Pretty-print any text based on brackets nesting. CLI crate"
 
 edition    = { workspace = true }
 license    = { workspace = true }
