@@ -8,7 +8,7 @@ version = "0.1.0"
 # crates.io. We'll consider doing it only if you express an interest in it.
 # Otherwise the API of this crate should not be considered stable/or public
 # until it's officially published on crates.io.
-publish = false
+publish = true
 
 edition    = { workspace = true }
 license    = { workspace = true }
