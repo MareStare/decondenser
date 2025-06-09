@@ -2,7 +2,7 @@
 
 Decondenser is a tool that prettifies condensed text based on bracket placement.
 
-It is available as:
+Decondenser is distributed in the following forms:
 
 - [VSCode extension](./decondenser-vscode)
 - [CLI](./decondenser-cli)
