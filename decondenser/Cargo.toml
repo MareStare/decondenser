@@ -1,5 +1,5 @@
 [package]
-name    = "decondenser-core"
+name    = "decondenser"
 version = "0.1.0"
 
 # We may consider publishing this crate if people want to use it as a library.

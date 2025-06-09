@@ -1,5 +1,5 @@
 [workspace]
-members = ["decondenser-core", "decondenser-wasm"]
+members = ["decondenser", "decondenser-cli", "decondenser-wasm"]
 
 resolver = "3"
 
@@ -9,7 +9,7 @@ license    = "MIT OR Apache-2.0"
 repository = "https://github.com/amredev/decondenser"
 
 [workspace.dependencies]
-decondenser-core = { path = "decondenser-core" }
+decondenser = { path = "decondenser" }
 
 [workspace.lints.clippy]
 # `map_or` and `map_or_else` are less readable than `map` followed

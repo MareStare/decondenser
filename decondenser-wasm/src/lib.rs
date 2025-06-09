@@ -11,10 +11,10 @@ bindings::export!(Component with_types_in bindings);
 
 impl bindings::Guest for Component {
     fn unescape(input: String) -> String {
-        decondenser_core::unescape(&input)
+        decondenser::unescape(&input)
     }
 
     fn decondense(input: String, indent: String) -> String {
-        decondenser_core::decondense(&input, &indent)
+        decondenser::decondense(&input, &indent)
     }
 }

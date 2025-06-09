@@ -1,0 +1,30 @@
+[package]
+name    = "decondenser-cli"
+version = "0.1.0"
+
+# At the time of this writing only pre-compiled binaries are distributed.
+# It's still possible to compile this crate from source with
+# ```
+# cargo install --git https://github.com/amredev/decondenser decondenser-cli
+# ```
+publish = false
+
+edition    = { workspace = true }
+license    = { workspace = true }
+repository = { workspace = true }
+
+[lints]
+workspace = true
+
+[[bin]]
+name = "decondenser"
+path = "src/main.rs"
+
+# If docs are enabled, they collide with the docs for the `decondenser` library
+# crate. Details: https://github.com/rust-lang/cargo/issues/6313
+doc = false
+
+[dependencies]
+anyhow      = "1.0"
+clap        = { version = "4.5", features = ["derive"] }
+decondenser = { path = "../decondenser" }
