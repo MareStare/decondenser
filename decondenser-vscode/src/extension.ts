@@ -12,8 +12,12 @@ export async function activate(ctx: vscode.ExtensionContext) {
         ctx.subscriptions.push(command);
     }
 
-    addCommand("decondenser.decondense", () => decondense(false));
-    addCommand("decondenser.unescape.decondense", () => decondense(true));
+    addCommand("decondenser.decondense", () => {
+        decondense(false);
+    });
+    addCommand("decondenser.unescape.decondense", () => {
+        decondense(true);
+    });
 }
 
 function decondense(shouldUnescape: boolean) {
@@ -35,7 +39,9 @@ function decondense(shouldUnescape: boolean) {
 
     const output = decondenser.decondense(input, " ".repeat(getIndent()));
 
-    editor.edit((edit) => edit.replace(selection, output));
+    editor.edit((edit) => {
+        edit.replace(selection, output);
+    });
 }
 
 function fullDocumentSelection(
@@ -50,7 +56,7 @@ function fullDocumentSelection(
 }
 
 function getIndent(): number {
-    let indent = vscode.workspace
+    const indent = vscode.workspace
         .getConfiguration("decondenser")
         .get("indentationSize");
 
@@ -60,6 +66,3 @@ function getIndent(): number {
 
     return indent;
 }
-
-// This method is called when your extension is deactivated
-export function deactivate() {}

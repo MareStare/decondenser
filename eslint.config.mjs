@@ -12,7 +12,7 @@ export default tseslint.config(
         languageOptions: {
             parserOptions: {
                 projectService: {
-                    allowDefaultProject: ["eslint.config.mjs"],
+                    allowDefaultProject: ["eslint.config.mjs", "decondenser-vscode/esbuild.mjs"],
                     defaultProject: "./tsconfig.base.json",
                 },
                 tsconfigRootDir: import.meta.dirname,
