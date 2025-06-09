@@ -39,7 +39,8 @@ jobs:
 
       - run: npm ci --workspaces
       - run: ./decondenser-ts/build.sh
-      - run: npm run --workspace decondenser-vscode lint
+      - run: npm run fmt:check
+      - run: npm run lint
       - run: npm run --workspace decondenser-vscode build
 
   cargo-fmt:
