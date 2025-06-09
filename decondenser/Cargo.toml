@@ -1,6 +1,7 @@
 [package]
 name    = "decondenser"
 version = "0.1.0"
+description = "Pretty-print any text based on brackets nesting"
 
 # We may consider publishing this crate if people want to use it as a library.
 # So if you (yes you!, the one reading this comment), want to use this crate as
