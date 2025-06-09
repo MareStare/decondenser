@@ -4,14 +4,14 @@ Decondenser is a tool that prettifies condensed text based on bracket placement.
 
 It is available as:
 
-- VSCode extension
-- CLI
+- [VSCode extension](./decondenser-vscode)
+- [CLI](./decondenser-cli)
 
 ⚠️ This project is WIP. It is not in a workable MVP state yet, so please wait for its initial release announcement.
 
 ## Contributing
 
-Any contributions are welcome! Feel free to submit an issue or a PR ❤️, and it'll be reviewed.
+Any contributions are welcome ❤️! Feel free to submit an issue or a PR, and it'll be reviewed/merged.
 
 ## License
 
