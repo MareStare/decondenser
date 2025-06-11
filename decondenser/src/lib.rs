@@ -2,6 +2,7 @@
 #![allow(warnings)]
 
 mod decondense;
+mod error;
 mod tokenize;
 mod unescape;
 
