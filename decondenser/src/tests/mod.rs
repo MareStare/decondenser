@@ -29,53 +29,53 @@ fn snapshot_tests() {
     expect_test::expect_file![tests_file].assert_eq(&actual);
 }
 
-// fn token_tree_to_snapshot(token: TokenTree) -> toml_edit::Value {
-//     match token {
-//         TokenTree::Whitespace { start } => format!("Whitespace({start})").into(),
-//         TokenTree::Group(group) => <_>::from_iter([
-//             (
-//                 "group",
-//                 [group.opening]
-//                     .into_iter()
-//                     .chain(group.closing)
-//                     .map(i64::from)
-//                     .collect(),
-//             ),
-//             (
-//                 "content",
-//                 group
-//                     .content
-//                     .into_iter()
-//                     .map(token_tree_to_snapshot)
-//                     .collect::<toml_edit::Value>(),
-//             ),
-//         ]),
-//         TokenTree::Quoted(quoted) => <_>::from_iter([
-//             (
-//                 "quoted",
-//                 [quoted.opening]
-//                     .into_iter()
-//                     .chain(quoted.closing)
-//                     .map(i64::from)
-//                     .collect(),
-//             ),
-//             (
-//                 "content",
-//                 quoted
-//                     .content
-//                     .into_iter()
-//                     .map(quoted_content_to_snapshot)
-//                     .collect::<toml_edit::Value>(),
-//             ),
-//         ]),
-//         TokenTree::Raw { start } => format!("Raw({start})").into(),
-//         TokenTree::Punct { start } => format!("Punct({start})").into(),
-//     }
-// }
+fn token_tree_to_snapshot(token: TokenTree) -> toml_edit::Value {
+    match token {
+        TokenTree::Whitespace { start } => format!("Whitespace({start})").into(),
+        TokenTree::Group(group) => <_>::from_iter([
+            (
+                "group",
+                [group.opening]
+                    .into_iter()
+                    .chain(group.closing)
+                    .map(i64::from)
+                    .collect(),
+            ),
+            (
+                "content",
+                group
+                    .content
+                    .into_iter()
+                    .map(token_tree_to_snapshot)
+                    .collect::<toml_edit::Value>(),
+            ),
+        ]),
+        TokenTree::Quoted(quoted) => <_>::from_iter([
+            (
+                "quoted",
+                [quoted.opening]
+                    .into_iter()
+                    .chain(quoted.closing)
+                    .map(i64::from)
+                    .collect(),
+            ),
+            (
+                "content",
+                quoted
+                    .content
+                    .into_iter()
+                    .map(quoted_content_to_snapshot)
+                    .collect::<toml_edit::Value>(),
+            ),
+        ]),
+        TokenTree::Raw { start } => format!("Raw({start})").into(),
+        TokenTree::Punct { start } => format!("Punct({start})").into(),
+    }
+}
 
-// fn quoted_content_to_snapshot(quoted: QuotedContent) -> toml_edit::Value {
-//     match quoted {
-//         QuotedContent::Raw { start } => format!("Raw({start})").into(),
-//         QuotedContent::Escape { start } => format!("Escape({start})").into(),
-//     }
-// }
+fn quoted_content_to_snapshot(quoted: QuotedContent) -> toml_edit::Value {
+    match quoted {
+        QuotedContent::Raw { start } => format!("Raw({start})").into(),
+        QuotedContent::Escape { start } => format!("Escape({start})").into(),
+    }
+}
