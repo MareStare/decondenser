@@ -1,5 +1,5 @@
-use crate::LanguageSpec;
-use crate::tokenize::{QuotedContent, TokenTree, TokenizeParams};
+use crate::LanguageConfig;
+use crate::parse::{QuotedContent, Token, TokenizeParams};
 use std::path::PathBuf;
 use std::str::FromStr;
 
@@ -18,8 +18,8 @@ fn snapshot_tests() {
     for (test_name, test) in tests.as_table_mut().iter_mut() {
         let test = test.as_table_mut().unwrap();
         let input = test["input"].as_str().unwrap();
-        let lang = &LanguageSpec::generic();
-        let actual_tokens = crate::tokenize::tokenize(TokenizeParams { input, lang }).unwrap();
+        let lang = &LanguageConfig::generic();
+        let actual_tokens = crate::parse::tokenize(TokenizeParams { input, lang }).unwrap();
 
         test["tokens"] = format!("{actual_tokens:#?}").into();
     }
@@ -29,10 +29,10 @@ fn snapshot_tests() {
     expect_test::expect_file![tests_file].assert_eq(&actual);
 }
 
-fn token_tree_to_snapshot(token: TokenTree) -> toml_edit::Value {
+fn token_tree_to_snapshot(token: Token) -> toml_edit::Value {
     match token {
-        TokenTree::Whitespace { start } => format!("Whitespace({start})").into(),
-        TokenTree::Group(group) => <_>::from_iter([
+        Token::Whitespace { start } => format!("Whitespace({start})").into(),
+        Token::Group(group) => <_>::from_iter([
             (
                 "group",
                 [group.opening]
@@ -50,7 +50,7 @@ fn token_tree_to_snapshot(token: TokenTree) -> toml_edit::Value {
                     .collect::<toml_edit::Value>(),
             ),
         ]),
-        TokenTree::Quoted(quoted) => <_>::from_iter([
+        Token::Quoted(quoted) => <_>::from_iter([
             (
                 "quoted",
                 [quoted.opening]
@@ -68,8 +68,8 @@ fn token_tree_to_snapshot(token: TokenTree) -> toml_edit::Value {
                     .collect::<toml_edit::Value>(),
             ),
         ]),
-        TokenTree::Raw { start } => format!("Raw({start})").into(),
-        TokenTree::Punct { start } => format!("Punct({start})").into(),
+        Token::Raw { start } => format!("Raw({start})").into(),
+        Token::Punct { start } => format!("Punct({start})").into(),
     }
 }
 

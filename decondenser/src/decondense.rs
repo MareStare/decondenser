@@ -1,10 +1,35 @@
-use std::borrow::Cow;
+use crate::parse::{Token, TokenizeParams, tokenize};
+use crate::{LanguageConfig, Result, Str};
+use std::path::PathBuf;
 
-/// The main function of this crate that decondenses the input according to the
-/// nesting of the following groups of characters: `()`, `[]`, `{}`.
+pub struct DecondenseParams<'a> {
+    pub input: &'a str,
+    pub lang: &'a LanguageConfig<'a>,
+}
+
+pub struct DecondenseOutput {
+    pub output: String,
+}
+
+/// Format any text according to brackets nesting and other simple rules.
 #[must_use = "this is a pure function; ignoring its result is definitely a bug"]
-pub fn decondense(input: &str, indent: &str) -> String {
-    todo!()
+pub fn decondense(params: &DecondenseParams<'_>) -> Result<DecondenseOutput> {
+    let tokens = tokenize(TokenizeParams {
+        input: params.input,
+        lang: params.lang,
+    })?;
+
+    let mut doc = allman::Doc::new();
+
+    for token in tokens {
+        match token {
+            Token::Whitespace { start } => doc.tag(allman::Tag::Space),
+            Token::Group(group) => todo!(),
+            Token::Quoted(quoted) => todo!(),
+            Token::Raw { start } => todo!(),
+            Token::Punct { start } => todo!(),
+        }
+    }
 }
 
 // TODO: add tests

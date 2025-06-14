@@ -1,6 +1,6 @@
 mod cursor;
 
-use crate::{EscapeSpec, GroupSpec, LanguageSpec, QuoteSpec, Str};
+use crate::{EscapeConfig, GroupConfig, LanguageConfig, QuoteConfig, Str};
 
 use crate::error::Result;
 use cursor::Cursor;
@@ -9,7 +9,7 @@ use std::marker::PhantomData;
 use std::mem;
 
 #[derive(Debug)]
-pub(crate) enum TokenTree {
+pub(crate) enum AstNode {
     Whitespace { start: u32 },
     Group(Group),
     Quoted(Quoted),
@@ -43,40 +43,40 @@ pub(crate) struct Group {
     /// The start offset of the opening delimiter
     pub(crate) opening: u32,
 
-    /// The first token contains the start offset of the content of the group,
+    /// The first node contains the start offset of the content of the group,
     /// unless the group is empty.
-    pub(crate) content: Vec<TokenTree>,
+    pub(crate) content: Vec<AstNode>,
 
     /// Offset of the closing delimiter. Can be `None` if the group is not closed
     /// (probably a malformed input).
     pub(crate) closing: Option<u32>,
 }
 
-pub(crate) struct TokenizeParams<'a> {
+pub(crate) struct ParseParams<'a> {
     pub(crate) input: &'a str,
-    pub(crate) lang: &'a LanguageSpec<'a>,
+    pub(crate) lang: &'a LanguageConfig<'a>,
 }
 
-pub(crate) fn tokenize(params: TokenizeParams<'_>) -> Result<Vec<TokenTree>> {
-    let mut lexer = Lexer {
+pub(crate) fn parse(params: ParseParams<'_>) -> Result<Vec<AstNode>> {
+    let mut lexer = Parser {
         lang: params.lang,
         cursor: Cursor::new(params.input)?,
         output: Vec::new(),
     };
 
-    lexer.tokenize(None);
+    lexer.parse(None);
 
     Ok(lexer.output)
 }
 
-struct Lexer<'a> {
-    lang: &'a LanguageSpec<'a>,
+struct Parser<'a> {
+    lang: &'a LanguageConfig<'a>,
     cursor: Cursor<'a>,
-    output: Vec<TokenTree>,
+    output: Vec<AstNode>,
 }
 
-impl<'a> Lexer<'a> {
-    fn tokenize(&mut self, terminator: Option<&Str<'a>>) -> Option<u32> {
+impl Parser<'_> {
+    fn parse(&mut self, terminator: Option<&Str<'_>>) -> Option<u32> {
         while self.cursor.peek().is_some() {
             self.whitespace();
 
@@ -84,21 +84,21 @@ impl<'a> Lexer<'a> {
                 return Some(start);
             }
 
-            let group_spec = self.lang.groups.iter().find_map(|group_spec| {
-                Some((self.cursor.strip_prefix(&group_spec.opening)?, group_spec))
+            let group_cfg = self.lang.groups.iter().find_map(|group_cfg| {
+                Some((self.cursor.strip_prefix(&group_cfg.opening)?, group_cfg))
             });
 
-            if let Some((opening, group_spec)) = group_spec {
-                self.tokenize_group(opening, group_spec);
+            if let Some((opening, group_cfg)) = group_cfg {
+                self.parse_group(opening, group_cfg);
                 continue;
             }
 
-            let quote_spec = self.lang.quotes.iter().find_map(|quote_spec| {
-                Some((self.cursor.strip_prefix(&quote_spec.opening)?, quote_spec))
+            let quote_cfg = self.lang.quotes.iter().find_map(|quote_cfg| {
+                Some((self.cursor.strip_prefix(&quote_cfg.opening)?, quote_cfg))
             });
 
-            if let Some((opening, quote_spec)) = quote_spec {
-                self.tokenize_quoted(opening, quote_spec);
+            if let Some((opening, quote_cfg)) = quote_cfg {
+                self.parse_quoted(opening, quote_cfg);
                 continue;
             }
 
@@ -109,13 +109,13 @@ impl<'a> Lexer<'a> {
                 .find_map(|punct| self.cursor.strip_prefix(punct));
 
             if let Some(start) = punct {
-                self.output.push(TokenTree::Punct { start });
+                self.output.push(AstNode::Punct { start });
                 continue;
             }
 
-            if !matches!(self.output.last(), Some(TokenTree::Raw { .. })) {
+            if !matches!(self.output.last(), Some(AstNode::Raw { .. })) {
                 let start = self.cursor.byte_offset();
-                self.output.push(TokenTree::Raw { start });
+                self.output.push(AstNode::Raw { start });
             }
 
             self.cursor.next();
@@ -124,10 +124,10 @@ impl<'a> Lexer<'a> {
         None
     }
 
-    fn tokenize_group(&mut self, opening: u32, group_spec: &GroupSpec<'a>) {
+    fn parse_group(&mut self, opening: u32, group_cfg: &GroupConfig<'_>) {
         let prev = mem::take(&mut self.output);
 
-        let closing = self.tokenize(Some(&group_spec.closing));
+        let closing = self.parse(Some(&group_cfg.closing));
 
         let group = Group {
             opening,
@@ -135,14 +135,14 @@ impl<'a> Lexer<'a> {
             closing,
         };
 
-        self.output.push(TokenTree::Group(group));
+        self.output.push(AstNode::Group(group));
     }
 
-    fn tokenize_quoted(&mut self, opening: u32, quote_spec: &QuoteSpec<'a>) {
+    fn parse_quoted(&mut self, opening: u32, quote_cfg: &QuoteConfig<'_>) {
         let mut content = vec![];
 
         let closing = loop {
-            let escape = quote_spec
+            let escape = quote_cfg
                 .escapes
                 .iter()
                 .find_map(|escape| self.cursor.strip_prefix(&escape.escaped));
@@ -152,7 +152,7 @@ impl<'a> Lexer<'a> {
                 continue;
             }
 
-            if let Some(closing) = self.cursor.strip_prefix(&quote_spec.closing) {
+            if let Some(closing) = self.cursor.strip_prefix(&quote_cfg.closing) {
                 break Some(closing);
             }
 
@@ -170,7 +170,7 @@ impl<'a> Lexer<'a> {
             closing,
         };
 
-        self.output.push(TokenTree::Quoted(quoted));
+        self.output.push(AstNode::Quoted(quoted));
     }
 
     fn whitespace(&mut self) {
@@ -181,7 +181,7 @@ impl<'a> Lexer<'a> {
         }
 
         let start = self.cursor.byte_offset();
-        self.output.push(TokenTree::Whitespace { start });
+        self.output.push(AstNode::Whitespace { start });
 
         while let Some(char) = self.cursor.peek() {
             if !char.is_whitespace() {
@@ -190,27 +190,4 @@ impl<'a> Lexer<'a> {
             self.cursor.next();
         }
     }
-}
-#[derive(Debug, Clone, Copy, PartialEq)]
-enum State {
-    // Start state is assigned:
-    // - at the start of parsing
-    // - when met \ after comma: key: value,\
-    // - when met " end of the string
-    // - when met open bracket after comma: [[1],[2]]
-    // - when met closing bracket after comma (no trailing comma added): [[1,2,]]
-    // - when met any character after comma: {key1: value1,key2: [1,2,3]}
-    Start,
-    // String state is assigned:
-    // - when met " start of the string: {key: "abc"}
-    // - when met \ is escape state: "\\abc"
-    // - when met " after comma: ["value1","value2", "value3"]
-    // - when met any character in escape state: "\X"
-    String,
-    // Escape state is assigned:
-    // - when met \ in string: "\"
-    Escape,
-    // AfterComma state is assigned:
-    // - when met , in start state: [1,2,3,] | {key: value,}
-    AfterComma,
 }
