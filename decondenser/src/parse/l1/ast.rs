@@ -1,10 +1,22 @@
 #[derive(Debug)]
 pub(crate) enum AstNode {
     Whitespace { start: usize },
-    Group(Group),
-    Quoted(Quoted),
     Raw { start: usize },
     Punct { start: usize },
+    Group(Group),
+    Quoted(Quoted),
+}
+
+impl AstNode {
+    pub(crate) fn start(&self) -> usize {
+        match self {
+            AstNode::Whitespace { start } => *start,
+            AstNode::Raw { start } => *start,
+            AstNode::Punct { start } => *start,
+            AstNode::Group(group) => group.opening,
+            AstNode::Quoted(quoted) => quoted.opening,
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -26,6 +38,15 @@ pub(crate) struct Quoted {
 pub(crate) enum QuotedContent {
     Raw { start: usize },
     Escape { start: usize },
+}
+
+impl QuotedContent {
+    pub(crate) fn start(&self) -> usize {
+        match self {
+            QuotedContent::Raw { start } => *start,
+            QuotedContent::Escape { start } => *start,
+        }
+    }
 }
 
 #[derive(Debug)]

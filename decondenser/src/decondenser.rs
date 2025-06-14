@@ -6,26 +6,50 @@ pub struct EscapeConfig<'a> {
 }
 
 pub struct GroupConfig<'a> {
+    /// The sequence that opens the group.
     pub opening: Str<'a>,
+
+    /// The sequence that closes the group.
     pub closing: Str<'a>,
 }
 
 pub struct QuoteConfig<'a> {
+    /// The sequence that opens the quoted content.
     pub opening: Str<'a>,
+
+    /// The sequence that closes the quoted content.
     pub closing: Str<'a>,
+
+    /// The sequences that are used to escape special characters in the quoted
+    /// content.
     pub escapes: &'a [EscapeConfig<'a>],
 }
 
-pub struct LanguageConfig<'a> {
+pub struct Decondenser<'a> {
+    /// A string used to indent a single level of nesting.
+    pub indent: Str<'a>,
+
+    /// Max number of characters per line.
+    ///
+    /// The width of each character is measured with the `unicode_width` crate.
+    pub max_width: usize,
+
+    /// Groups of sequences used to nest content.
     pub groups: &'a [GroupConfig<'a>],
+
+    /// Quotes notations that enclose unbreakable string-literal content.
     pub quotes: &'a [QuoteConfig<'a>],
+
+    /// Punctuation sequences used to separate content.
     pub puncts: &'a [Str<'a>],
 }
 
-impl LanguageConfig<'_> {
-    pub fn generic() -> LanguageConfig<'static> {
+impl Decondenser<'_> {
+    pub fn generic() -> Decondenser<'static> {
         const {
-            LanguageConfig {
+            Decondenser {
+                max_width: 80,
+                indent: Str::borrowed("  "),
                 groups: &[
                     GroupConfig {
                         opening: Str::borrowed("("),

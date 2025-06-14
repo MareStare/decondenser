@@ -90,6 +90,9 @@
         // Rust LSP
         "rust-lang.rust-analyzer",
 
+        // Rust debugger
+        "vadimcn.vscode-lldb",
+
         // Generic dependency management, includes Rust support
         "fill-labs.dependi",
 

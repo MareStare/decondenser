@@ -1,4 +1,4 @@
-use crate::LanguageConfig;
+use crate::Config;
 use crate::parse::{QuotedContent, Token, TokenizeParams};
 use std::path::PathBuf;
 use std::str::FromStr;
@@ -18,7 +18,7 @@ fn snapshot_tests() {
     for (test_name, test) in tests.as_table_mut().iter_mut() {
         let test = test.as_table_mut().unwrap();
         let input = test["input"].as_str().unwrap();
-        let lang = &LanguageConfig::generic();
+        let lang = &Config::generic();
         let actual_tokens = crate::parse::tokenize(TokenizeParams { input, lang }).unwrap();
 
         test["tokens"] = format!("{actual_tokens:#?}").into();

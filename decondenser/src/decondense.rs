@@ -1,88 +1,75 @@
-use crate::parse::{Token, TokenizeParams, tokenize};
-use crate::{LanguageConfig, Result, Str};
+use crate::parse;
+use crate::{Result, Str};
 use std::path::PathBuf;
 
-pub struct DecondenseParams<'a> {
-    pub input: &'a str,
-    pub lang: &'a LanguageConfig<'a>,
-}
+impl crate::Decondenser<'_> {
+    /// Format any text according to brackets nesting and other simple rules.
+    #[must_use = "this is a pure function; ignoring its result is definitely a bug"]
+    pub fn decondense(&self, input: &str) -> Result<String> {
+        let ast = parse::l2::parse(&parse::l1::ParseParams {
+            input,
+            config: self,
+        });
 
-pub struct DecondenseOutput {
-    pub output: String,
-}
+        let mut formatter = allman::Doc::new();
 
-/// Format any text according to brackets nesting and other simple rules.
-#[must_use = "this is a pure function; ignoring its result is definitely a bug"]
-pub fn decondense(params: &DecondenseParams<'_>) -> Result<DecondenseOutput> {
-    let tokens = tokenize(TokenizeParams {
-        input: params.input,
-        lang: params.lang,
-    })?;
+        Self::configure_formatter(&mut formatter, &ast);
 
-    let mut doc = allman::Doc::new();
+        dbg!(&formatter);
 
-    for token in tokens {
-        match token {
-            Token::Whitespace { start } => doc.tag(allman::Tag::Space),
-            Token::Group(group) => todo!(),
-            Token::Quoted(quoted) => todo!(),
-            Token::Raw { start } => todo!(),
-            Token::Punct { start } => todo!(),
+        let mut output = vec![];
+
+        formatter.render(
+            &mut output,
+            &allman::Options {
+                max_columns: self.max_width,
+            },
+        );
+
+        let output = String::from_utf8_lossy(&output).into_owned();
+
+        Ok(output)
+    }
+
+    fn configure_formatter<'a>(doc: &mut allman::Doc<'a>, nodes: &[parse::l2::AstNode<'a>]) {
+        use allman::{Doc, If, Tag};
+
+        for node in nodes {
+            match node {
+                &parse::l2::AstNode::Whitespace(content) => {
+                    doc.tag(Tag::Space);
+                }
+                &parse::l2::AstNode::Raw(content) => {
+                    doc.tag(Tag::Text(content.into()));
+                }
+                &parse::l2::AstNode::Punct(content) => {
+                    doc.tag(Tag::Text(content.into()));
+                }
+                parse::l2::AstNode::Group(group) => {
+                    doc.tag_with(Tag::Group(usize::MAX), |doc| {
+                        doc.tag(Tag::Text(group.opening.into()));
+                        doc.tag_if(Tag::Break(1), If::Broken);
+                        doc.tag_with(Tag::Indent(1), |formatter| {
+                            Self::configure_formatter(formatter, &group.content);
+                        });
+                        if let Some(closing) = group.closing {
+                            doc.tag_if(Tag::Break(1), If::Broken);
+                            doc.tag(Tag::Text(closing.into()));
+                        }
+                    });
+                }
+                parse::l2::AstNode::Quoted(quoted) => {
+                    doc.tag(Tag::Text(quoted.opening.into()));
+
+                    for content in &quoted.content {
+                        doc.tag(Tag::Text(content.text().into()));
+                    }
+
+                    if let Some(closing) = quoted.closing {
+                        doc.tag(Tag::Text(closing.into()));
+                    }
+                }
+            }
         }
     }
 }
-
-// TODO: add tests
-// suite("Extension Test Suite", () => {
-//     vscode.window.showInformationMessage("Start all tests.");
-
-//     test("Smoke test", () => {
-//         const text = `Test {key1:"value1","key2": "value2"}[[1],[2],[3],]{"key1":"value1","key2":[123]}`;
-//         const expected = `\
-// Test {
-//     key1:"value1",
-//     "key2": "value2"
-// }[
-//     [
-//         1
-//     ],
-//     [
-//         2
-//     ],
-//     [
-//         3
-//     ]
-// ]{
-//     "key1":"value1",
-//     "key2":[
-//         123
-//     ]
-// }`;
-//         const output = decondenser.decondense(text, "    ");
-//         assert.strictEqual(expected, output);
-//     });
-
-//     test("Escape test", () => {
-//         const text = `{"key": "\\n\\r\\t"}`;
-//         const output = decondenser.decondense(text, "    ");
-//         assert.strictEqual(`{\n    "key": "\\n\\r\\t"\n}`, output);
-//     });
-
-//     test("Unescape test \\n", () => {
-//         const text = `{"key": "val\nue"}`;
-//         const output = formatUnescapedText(text);
-//         assert.strictEqual(`{\n    "key": "val\nue"\n}`, output);
-//     });
-
-//     test("Unescape test \\r", () => {
-//         const text = `{"key": "val\rue"}`;
-//         const output = formatUnescapedText(text);
-//         assert.strictEqual(`{\n    "key": "val\rue"\n}`, output);
-//     });
-
-//     test("Unescape test \\t", () => {
-//         const text = `{"key": "val\tue"}`;
-//         const output = formatUnescapedText(text);
-//         assert.strictEqual(`{\n    "key": "val\tue"\n}`, output);
-//     });
-// });

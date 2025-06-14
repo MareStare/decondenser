@@ -1,8 +1,9 @@
 mod ast;
 mod cursor;
 
-use crate::{EscapeConfig, GroupConfig, LanguageConfig, QuoteConfig, Str};
-use ast::{AstNode, Group, Quoted, QuotedContent};
+pub(crate) use ast::*;
+
+use crate::{Decondenser, EscapeConfig, GroupConfig, QuoteConfig, Str};
 
 use crate::error::Result;
 use cursor::Cursor;
@@ -12,12 +13,12 @@ use std::mem;
 
 pub(crate) struct ParseParams<'a> {
     pub(crate) input: &'a str,
-    pub(crate) lang: &'a LanguageConfig<'a>,
+    pub(crate) config: &'a Decondenser<'a>,
 }
 
-pub(crate) fn parse(params: ParseParams<'_>) -> Vec<AstNode> {
+pub(crate) fn parse(params: &ParseParams<'_>) -> Vec<AstNode> {
     let mut lexer = Parser {
-        lang: params.lang,
+        config: params.config,
         cursor: Cursor::new(params.input),
         output: Vec::new(),
     };
@@ -26,7 +27,7 @@ pub(crate) fn parse(params: ParseParams<'_>) -> Vec<AstNode> {
 }
 
 struct Parser<'a> {
-    lang: &'a LanguageConfig<'a>,
+    config: &'a Decondenser<'a>,
     cursor: Cursor<'a>,
     output: Vec<AstNode>,
 }
@@ -40,7 +41,7 @@ impl Parser<'_> {
                 return Some(start);
             }
 
-            let group_cfg = self.lang.groups.iter().find_map(|group_cfg| {
+            let group_cfg = self.config.groups.iter().find_map(|group_cfg| {
                 Some((self.cursor.strip_prefix(&group_cfg.opening)?, group_cfg))
             });
 
@@ -49,7 +50,7 @@ impl Parser<'_> {
                 continue;
             }
 
-            let quote_cfg = self.lang.quotes.iter().find_map(|quote_cfg| {
+            let quote_cfg = self.config.quotes.iter().find_map(|quote_cfg| {
                 Some((self.cursor.strip_prefix(&quote_cfg.opening)?, quote_cfg))
             });
 
@@ -59,7 +60,7 @@ impl Parser<'_> {
             }
 
             let punct = self
-                .lang
+                .config
                 .puncts
                 .iter()
                 .find_map(|punct| self.cursor.strip_prefix(punct));
@@ -117,7 +118,9 @@ impl Parser<'_> {
                 content.push(QuotedContent::Raw { start });
             }
 
-            self.cursor.next();
+            if self.cursor.next().is_none() {
+                break None;
+            }
         };
 
         let quoted = Quoted {
@@ -130,10 +133,12 @@ impl Parser<'_> {
     }
 
     fn whitespace(&mut self) {
-        if let Some(char) = self.cursor.peek() {
-            if !char.is_whitespace() {
-                return;
-            }
+        let Some(char) = self.cursor.peek() else {
+            return;
+        };
+
+        if !char.is_whitespace() {
+            return;
         }
 
         let start = self.cursor.byte_offset();
@@ -141,7 +146,7 @@ impl Parser<'_> {
 
         while let Some(char) = self.cursor.peek() {
             if !char.is_whitespace() {
-                break;
+                return;
             }
             self.cursor.next();
         }
