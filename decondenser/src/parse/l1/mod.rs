@@ -1,6 +1,8 @@
+mod ast;
 mod cursor;
 
 use crate::{EscapeConfig, GroupConfig, LanguageConfig, QuoteConfig, Str};
+use ast::{AstNode, Group, Quoted, QuotedContent};
 
 use crate::error::Result;
 use cursor::Cursor;
@@ -8,65 +10,19 @@ use std::borrow::Cow;
 use std::marker::PhantomData;
 use std::mem;
 
-#[derive(Debug)]
-pub(crate) enum AstNode {
-    Whitespace { start: u32 },
-    Group(Group),
-    Quoted(Quoted),
-    Raw { start: u32 },
-    Punct { start: u32 },
-}
-
-#[derive(Debug)]
-pub(crate) struct Quoted {
-    /// Offset of the opening quote
-    pub(crate) opening: u32,
-
-    /// Offset of the content, which is also the offset of the character that
-    /// follows the opening quote. Will be equal to `closing` if the content
-    /// is empty.
-    pub(crate) content: Vec<QuotedContent>,
-
-    /// Offset of the closing quote. Can be `None` if the quotes are not closed
-    /// (probably a malformed input).
-    pub(crate) closing: Option<u32>,
-}
-
-#[derive(Debug)]
-pub(crate) enum QuotedContent {
-    Raw { start: u32 },
-    Escape { start: u32 },
-}
-
-#[derive(Debug)]
-pub(crate) struct Group {
-    /// The start offset of the opening delimiter
-    pub(crate) opening: u32,
-
-    /// The first node contains the start offset of the content of the group,
-    /// unless the group is empty.
-    pub(crate) content: Vec<AstNode>,
-
-    /// Offset of the closing delimiter. Can be `None` if the group is not closed
-    /// (probably a malformed input).
-    pub(crate) closing: Option<u32>,
-}
-
 pub(crate) struct ParseParams<'a> {
     pub(crate) input: &'a str,
     pub(crate) lang: &'a LanguageConfig<'a>,
 }
 
-pub(crate) fn parse(params: ParseParams<'_>) -> Result<Vec<AstNode>> {
+pub(crate) fn parse(params: ParseParams<'_>) -> Vec<AstNode> {
     let mut lexer = Parser {
         lang: params.lang,
-        cursor: Cursor::new(params.input)?,
+        cursor: Cursor::new(params.input),
         output: Vec::new(),
     };
-
     lexer.parse(None);
-
-    Ok(lexer.output)
+    lexer.output
 }
 
 struct Parser<'a> {
@@ -76,7 +32,7 @@ struct Parser<'a> {
 }
 
 impl Parser<'_> {
-    fn parse(&mut self, terminator: Option<&Str<'_>>) -> Option<u32> {
+    fn parse(&mut self, terminator: Option<&Str<'_>>) -> Option<usize> {
         while self.cursor.peek().is_some() {
             self.whitespace();
 
@@ -124,7 +80,7 @@ impl Parser<'_> {
         None
     }
 
-    fn parse_group(&mut self, opening: u32, group_cfg: &GroupConfig<'_>) {
+    fn parse_group(&mut self, opening: usize, group_cfg: &GroupConfig<'_>) {
         let prev = mem::take(&mut self.output);
 
         let closing = self.parse(Some(&group_cfg.closing));
@@ -138,7 +94,7 @@ impl Parser<'_> {
         self.output.push(AstNode::Group(group));
     }
 
-    fn parse_quoted(&mut self, opening: u32, quote_cfg: &QuoteConfig<'_>) {
+    fn parse_quoted(&mut self, opening: usize, quote_cfg: &QuoteConfig<'_>) {
         let mut content = vec![];
 
         let closing = loop {
